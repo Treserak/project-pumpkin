@@ -8,14 +8,14 @@ while true; do
   MEM_USAGE=$(free -m | awk '/Mem:/ {print $3 "MB / " $2 "MB"}')
   
   PLAYIT_STATUS="Inicializando..."
-  if [ -f "/app/playit.log" ]; then
+  if [ -f "/app/playit.toml" ] && [ -s "/app/playit.toml" ]; then
+    PLAYIT_STATUS="<span style='color:#22c55e;'>Túnel activo y permanente (playit.toml persistido)</span>"
+  elif pgrep -x playitd >/dev/null 2>&1; then
+    PLAYIT_STATUS="<span style='color:#22c55e;'>Túnel activo y enrutando</span>"
+  elif [ -f "/app/playit.log" ]; then
     CLAIM_URL=$(grep -oE 'https://playit\.gg/claim/[a-zA-Z0-9]+' /app/playit.log | tail -n 1)
     if [ -n "$CLAIM_URL" ]; then
       PLAYIT_STATUS="<span style='color:#f59e0b; font-weight:bold;'>⚠️ Reclama tu túnel:</span> <a href='$CLAIM_URL' target='_blank' style='color:#38bdf8; font-weight:bold; text-decoration: underline;'>$CLAIM_URL</a>"
-    elif pgrep -x playitd >/dev/null 2>&1; then
-      PLAYIT_STATUS="<span style='color:#22c55e;'>Túnel activo y conectado</span>"
-    else
-      PLAYIT_STATUS="<span style='color:#ef4444;'>Túnel no iniciado</span>"
     fi
   fi
 
@@ -52,6 +52,16 @@ while true; do
     <h1>🎃 Project Pumpkin <span class="badge">Rust Native</span></h1>
     <p style="color: #94a3b8; margin-top:-0.5rem; font-size: 0.9rem;">Servidor Minecraft optimizado con musl sobre Alpine Linux</p>
     
+    <div class="metric">
+      <div class="metric-title">IP de Conexión - Minecraft Java</div>
+      <div class="metric-value"><code style="background:#0f172a; padding:0.2rem 0.5rem; border-radius:4px; color:#38bdf8; font-size:1.1rem;">wap-south.tun.ply.gg</code> <span style="color:#94a3b8; font-size:0.85rem;">(Puerto: 25565)</span></div>
+    </div>
+
+    <div class="metric">
+      <div class="metric-title">IP de Conexión - Minecraft Bedrock</div>
+      <div class="metric-value"><code style="background:#0f172a; padding:0.2rem 0.5rem; border-radius:4px; color:#a855f7; font-size:1.1rem;">wap-own.tun.ply.gg:62563</code></div>
+    </div>
+
     <div class="metric">
       <div class="metric-title">Estado del Servidor</div>
       <div class="metric-value">$PUMPKIN_STATE</div>
