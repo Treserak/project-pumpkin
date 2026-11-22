@@ -9,11 +9,13 @@ while true; do
   
   PLAYIT_STATUS="Inicializando..."
   if [ -f "/app/playit.log" ]; then
-    CLAIM_URL=$(grep -oE 'https://playit.gg/claim/[a-zA-Z0-9]+' /app/playit.log | tail -n 1)
+    CLAIM_URL=$(grep -oE 'https://playit\.gg/claim/[a-zA-Z0-9]+' /app/playit.log | tail -n 1)
     if [ -n "$CLAIM_URL" ]; then
-      PLAYIT_STATUS="<span style='color:#f59e0b;'>Túnel pendiente de reclamo:</span> <a href='$CLAIM_URL' target='_blank' style='color:#38bdf8;'>$CLAIM_URL</a>"
+      PLAYIT_STATUS="<span style='color:#f59e0b; font-weight:bold;'>⚠️ Reclama tu túnel:</span> <a href='$CLAIM_URL' target='_blank' style='color:#38bdf8; font-weight:bold; text-decoration: underline;'>$CLAIM_URL</a>"
+    elif pgrep -x playitd >/dev/null 2>&1; then
+      PLAYIT_STATUS="<span style='color:#22c55e;'>Túnel activo y conectado</span>"
     else
-      PLAYIT_STATUS="<span style='color:#22c55e;'>Túnel activo y enrutando</span>"
+      PLAYIT_STATUS="<span style='color:#ef4444;'>Túnel no iniciado</span>"
     fi
   fi
 

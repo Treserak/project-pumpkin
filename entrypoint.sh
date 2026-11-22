@@ -148,6 +148,7 @@ shutdown_handler() {
   sleep 2
   kill -TERM "$PUMPKIN_PID" 2>/dev/null || true
   kill -TERM "$PLAYIT_PID" 2>/dev/null || true
+  kill -TERM "$SETUP_PID" 2>/dev/null || true
   kill -TERM "$UPDATER_PID" 2>/dev/null || true
   kill -TERM "$HTTPD_PID" 2>/dev/null || true
   wait "$PUMPKIN_PID" 2>/dev/null || true
@@ -172,11 +173,15 @@ UPDATER_PID=$!
 # 8. Iniciar Túnel Playit.gg
 echo "[Supervisor] Iniciando túnel playitd..."
 if [ -n "$PLAYIT_SECRET_KEY" ]; then
-  playitd --platform-docker --secret "$PLAYIT_SECRET_KEY" -l /app/playit.log >/dev/null 2>&1 &
+  playitd --platform-docker --secret "$PLAYIT_SECRET_KEY" > /app/playit.log 2>&1 &
+  PLAYIT_PID=$!
 else
-  playitd --platform-docker -l /app/playit.log >/dev/null 2>&1 &
+  playitd --platform-docker --socket-path /tmp/playit.sock > /app/playitd.log 2>&1 &
+  PLAYIT_PID=$!
+  sleep 2
+  playit --socket-path /tmp/playit.sock setup > /app/playit.log 2>&1 &
+  SETUP_PID=$!
 fi
-PLAYIT_PID=$!
 
 # 9. Iniciar Servidor Minecraft Pumpkin
 echo "[Supervisor] Iniciando motor Pumpkin..."
