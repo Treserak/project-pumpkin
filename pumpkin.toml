@@ -1,12 +1,12 @@
 seed = "1795944526530793893"
-default_difficulty = "Normal"
+default_difficulty = "Hard"
 op_permission_level = 4
 allow_nether = true
 allow_end = true
 hardcore = false
 tps = 20.0
 default_gamemode = "Survival"
-force_gamemode = false
+force_gamemode = true
 scrub_ips = true
 use_favicon = true
 default_level_name = "world"
