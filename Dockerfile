@@ -7,7 +7,8 @@ RUN apk add --no-cache \
     tar \
     ca-certificates \
     tini \
-    procps
+    procps \
+    busybox-extras
 
 # Instalar binario de Pumpkin compilado estáticamente con musl (x86_64)
 RUN curl -sSL https://github.com/SrDicov/Pumpkin/releases/download/v0.2.2-musl/pumpkin-X64-Linux -o /usr/local/bin/pumpkin && \

@@ -163,7 +163,7 @@ restore_latest_world
 
 # 7. Iniciar Servidor HTTP Keep-Alive en puerto 7860
 echo "[Supervisor] Iniciando micro-servidor HTTP en puerto 7860..."
-busybox httpd -p 7860 -h /app/www
+httpd -p 7860 -h /app/www
 HTTPD_PID=$!
 /app/http_updater.sh &
 UPDATER_PID=$!
