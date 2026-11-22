@@ -130,5 +130,10 @@ sub_motd = "Pumpkin Bedrock Server"
 [networking.bedrock.authentication]
 enabled = false
 
+[networking.bedrock.nethernet]
+enabled = true
+address = "0.0.0.0:19132"
+stun_servers = ["stun:stun.l.google.com:19302"]
+
 [telemetry]
 enabled = false
