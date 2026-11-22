@@ -161,9 +161,10 @@ trap shutdown_handler SIGTERM SIGINT SIGHUP
 # 6. Ejecutar restauración inicial
 restore_latest_world
 
-# 7. Iniciar Servidor HTTP Keep-Alive en puerto 7860
-echo "[Supervisor] Iniciando micro-servidor HTTP en puerto 7860..."
-httpd -p 7860 -h /app/www
+# 7. Iniciar Servidor HTTP Keep-Alive
+WEB_PORT="${PORT:-7860}"
+echo "[Supervisor] Iniciando micro-servidor HTTP en puerto $WEB_PORT..."
+httpd -p "$WEB_PORT" -h /app/www
 HTTPD_PID=$!
 /app/http_updater.sh &
 UPDATER_PID=$!
