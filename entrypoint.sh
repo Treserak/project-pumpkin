@@ -86,8 +86,12 @@ perform_backup() {
   echo "[Supervisor:Backup] Cambios detectados (Hash actual: ${CURRENT_HASH:0:12} vs previo: ${LAST_HASH:0:12})."
   TAG_NAME="backup-$(date +%Y%m%d-%H%M%S)"
   
-  echo "[Supervisor:Backup] Comprimiendo mundo a /tmp/world.tar.gz..."
-  tar -czf /tmp/world.tar.gz -C /app world
+  echo "[Supervisor:Backup] Comprimiendo mundo y credenciales a /tmp/world.tar.gz..."
+  FILES_TO_PACK="world"
+  if [ -f "/app/playit.toml" ]; then
+    FILES_TO_PACK="world playit.toml"
+  fi
+  tar -czf /tmp/world.tar.gz -C /app $FILES_TO_PACK
 
   echo "[Supervisor:Backup] Creando release en GitHub: $TAG_NAME..."
   REL_RESP=$(curl -s -X POST \
@@ -173,10 +177,15 @@ UPDATER_PID=$!
 # 8. Iniciar Túnel Playit.gg
 echo "[Supervisor] Iniciando túnel playitd..."
 if [ -n "$PLAYIT_SECRET_KEY" ]; then
-  playitd --platform-docker --secret "$PLAYIT_SECRET_KEY" > /app/playit.log 2>&1 &
+  playitd --platform-docker --socket-path /tmp/playit.sock --secret "$PLAYIT_SECRET_KEY" > /app/playit.log 2>&1 &
+  PLAYIT_PID=$!
+elif [ -f "/app/playit.toml" ] && [ -s "/app/playit.toml" ]; then
+  echo "[Supervisor] Encontrado /app/playit.toml persistido. Iniciando túnel permanente..."
+  playitd --platform-docker --socket-path /tmp/playit.sock --secret-path /app/playit.toml > /app/playit.log 2>&1 &
   PLAYIT_PID=$!
 else
-  playitd --platform-docker --socket-path /tmp/playit.sock > /app/playitd.log 2>&1 &
+  echo "[Supervisor] No se detectó secret previo. Generando nuevo enlace de reclamo..."
+  playitd --platform-docker --socket-path /tmp/playit.sock --secret-path /app/playit.toml > /app/playitd.log 2>&1 &
   PLAYIT_PID=$!
   sleep 2
   playit --socket-path /tmp/playit.sock setup > /app/playit.log 2>&1 &
