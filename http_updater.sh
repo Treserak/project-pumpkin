@@ -7,16 +7,22 @@ while true; do
   UPTIME_STR=$(uptime -p 2>/dev/null || uptime)
   MEM_USAGE=$(free -m | awk '/Mem:/ {print $3 "MB / " $2 "MB"}')
   
+  ln -sf /app/playit.log "$WWW_DIR/playit.log" 2>/dev/null || true
+  ln -sf /app/playitd.log "$WWW_DIR/playitd.log" 2>/dev/null || true
+  ln -sf /app/pumpkin.log "$WWW_DIR/pumpkin.log" 2>/dev/null || true
+
+  CLAIM_URL=""
+  if [ -f "/app/playit.log" ]; then
+    CLAIM_URL=$(grep -oE 'https://playit\.gg/claim/[a-zA-Z0-9]+' /app/playit.log | tail -n 1)
+  fi
+
   PLAYIT_STATUS="Inicializando..."
   if [ -f "/app/playit.toml" ] && [ -s "/app/playit.toml" ]; then
     PLAYIT_STATUS="<span style='color:#22c55e;'>Túnel activo y permanente (playit.toml persistido)</span>"
+  elif [ -n "$CLAIM_URL" ]; then
+    PLAYIT_STATUS="<span style='color:#f59e0b; font-weight:bold;'>⚠️ Reclama tu túnel:</span> <a href='$CLAIM_URL' target='_blank' style='color:#38bdf8; font-weight:bold; text-decoration: underline;'>$CLAIM_URL</a>"
   elif pgrep -x playitd >/dev/null 2>&1; then
-    PLAYIT_STATUS="<span style='color:#22c55e;'>Túnel activo y enrutando</span>"
-  elif [ -f "/app/playit.log" ]; then
-    CLAIM_URL=$(grep -oE 'https://playit\.gg/claim/[a-zA-Z0-9]+' /app/playit.log | tail -n 1)
-    if [ -n "$CLAIM_URL" ]; then
-      PLAYIT_STATUS="<span style='color:#f59e0b; font-weight:bold;'>⚠️ Reclama tu túnel:</span> <a href='$CLAIM_URL' target='_blank' style='color:#38bdf8; font-weight:bold; text-decoration: underline;'>$CLAIM_URL</a>"
-    fi
+    PLAYIT_STATUS="<span style='color:#22c55e;'>Túnel activo</span>"
   fi
 
   LAST_BACKUP="Ninguno registrado todavía"

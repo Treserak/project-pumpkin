@@ -201,10 +201,21 @@ echo "[Supervisor] Todos los servicios han arrancado correctamente. Entrando en 
 
 # 10. Bucle de respaldo cada 10 minutos (en pasos de 5s para respuesta ágil a señales)
 TICKS=0
+PLAYIT_BACKED=0
+if [ -f "/app/playit.toml" ] && [ -s "/app/playit.toml" ]; then
+  PLAYIT_BACKED=1
+fi
+
 while kill -0 "$PUMPKIN_PID" 2>/dev/null; do
   sleep 5
   TICKS=$((TICKS + 5))
-  if [ "$TICKS" -ge "$BACKUP_INTERVAL" ]; then
+
+  # Si playit.toml se acaba de aprovisionar y no se ha respaldado, respaldar de inmediato
+  if [ "$PLAYIT_BACKED" -eq 0 ] && [ -f "/app/playit.toml" ] && [ -s "/app/playit.toml" ]; then
+    echo "[Supervisor] ¡Nuevo playit.toml detectado! Ejecutando respaldo inmediato para persistirlo en GitHub..."
+    perform_backup
+    PLAYIT_BACKED=1
+  elif [ "$TICKS" -ge "$BACKUP_INTERVAL" ]; then
     perform_backup
     TICKS=0
   fi
