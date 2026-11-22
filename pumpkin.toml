@@ -120,11 +120,15 @@ allowed_url_domains = [".minecraft.net", ".mojang.com"]
 [networking.bedrock]
 enabled = true
 address = "0.0.0.0:19132"
+online_mode = false
 max_players = 20
 view_distance = 12
 simulation_distance = 10
 motd = "Project Pumpkin Bedrock"
 sub_motd = "Pumpkin Bedrock Server"
+
+[networking.bedrock.authentication]
+enabled = false
 
 [telemetry]
 enabled = false
